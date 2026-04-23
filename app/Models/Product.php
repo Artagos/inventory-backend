@@ -15,6 +15,7 @@ class Product extends Model
         'quantity',
         'min_threshold',
         'category_id',
+        'user_id',
     ];
 
     protected $casts = [
@@ -25,6 +26,11 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function isLowStock(): bool

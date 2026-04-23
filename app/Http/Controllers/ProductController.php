@@ -10,7 +10,9 @@ class ProductController extends Controller
 {
     public function index(): JsonResponse
     {
-        $products = Product::with('category')->get();
+        $products = Product::where('user_id', auth()->id())
+            ->with('category')
+            ->get();
         return response()->json($products);
     }
 
@@ -23,18 +25,27 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
         ]);
 
+        $validated['user_id'] = auth()->id();
         $product = Product::create($validated);
         return response()->json($product, 201);
     }
 
     public function show(Product $product): JsonResponse
     {
+        if ($product->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+        
         $product->load('category');
         return response()->json($product);
     }
 
     public function update(Request $request, Product $product): JsonResponse
     {
+        if ($product->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'quantity' => 'sometimes|integer|min:0',
@@ -48,13 +59,20 @@ class ProductController extends Controller
 
     public function destroy(Product $product): JsonResponse
     {
+        if ($product->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         $product->delete();
         return response()->json(null, 204);
     }
 
     public function lowStock(): JsonResponse
     {
-        $products = Product::lowStock()->with('category')->get();
+        $products = Product::where('user_id', auth()->id())
+            ->lowStock()
+            ->with('category')
+            ->get();
         return response()->json($products);
     }
 }

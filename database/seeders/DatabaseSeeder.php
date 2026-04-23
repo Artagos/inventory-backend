@@ -15,11 +15,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Create exactly 4 categories first
+        $categories = \App\Models\Category::factory(3)->create();
 
+
+        // Create a specific test user with 5 products
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
-        ]);
+        ])->each(function ($user) {
+            \App\Models\Product::factory(5)->create([
+                'user_id' => $user->id,
+                'category_id' => \App\Models\Category::inRandomOrder()->first()->id
+            ]);
+        });
     }
 }
