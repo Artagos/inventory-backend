@@ -1,2 +1,2 @@
 # inventory-backend
-A php + laravelm backend project
+A php + laravel backend project
